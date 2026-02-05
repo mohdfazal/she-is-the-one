@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Little Universe ✨</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           GLOBAL STYLES & RESET
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blush-pink: #ffb3d9;
+            --rose-red: #ff6b9d;
+            --lavender: #c8a2c8;
+            --warm-cream: #fff8f0;
+            --soft-white: #fffef9;
+            --deep-pink: #ff1493;
+            --shadow-soft: rgba(255, 107, 157, 0.2);
+            --shadow-medium: rgba(255, 107, 157, 0.3);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--warm-cream) 0%, #ffeef7 50%, #fff0f5 100%);
+            color: #4a4a4a;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           PASSWORD SCREEN
+           ============================================ */
+        .password-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--blush-pink) 0%, var(--lavender) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+
+        .password-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .lock-icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .password-container {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px var(--shadow-medium);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-container h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 1rem;
+            color: #333;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus {
+            border-color: var(--rose-red);
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 20px var(--shadow-soft);
+        }
+
+        .password-btn {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--rose-red), var(--deep-pink));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow-medium);
+        }
+
+        .password-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-medium);
+        }
+
+        .password-hint {
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .error-message {
+            color: #fff;
+            background: rgba(255, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main-content {
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(3rem, 8vw, 6rem);
+            color: var(--rose-red);
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 8px var(--shadow-soft);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            color: #666;
+            max-width: 600px;
+            line-height: 1.8;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        /* Floating Hearts Animation */
+        .hearts-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 1.5rem;
+            color: var(--rose-red);
+            opacity: 0.6;
+            animation: floatHeart 15s infinite ease-in-out;
+        }
+
+        /* ============================================
+           PHOTO SECTION
+           ============================================ */
+        .photo-section {
+            padding: 5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            position: relative;
+        }
+
+        .photo-frame {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 20px 60px var(--shadow-medium);
+            animation: zoomIn 1s ease-out;
+            margin-bottom: 2rem;
+        }
+
+        .photo-frame::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blush-pink), var(--lavender), var(--rose-red));
+            z-index: -1;
+            animation: rotateGlow 3s linear infinite;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .photo-caption {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--rose-red);
+            text-align: center;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           WHY I LOVE YOU SECTION
+           ============================================ */
+        .love-reasons {
+            padding: 5rem 2rem;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            text-align: center;
+            color: var(--rose-red);
+            margin-bottom: 3rem;
+        }
+
+        .reasons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .reason-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px var(--shadow-soft);
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reason-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reason-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px var(--shadow-medium);
+        }
+
+        .reason-number {
+            font-size: 2rem;
+            color: var(--rose-red);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .reason-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        /* ============================================
+           TIMELINE SECTION
+           ============================================ */
+        .timeline-section {
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--blush-pink), var(--rose-red), var(--lavender));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.6s ease;
+        }
+
+        .timeline-item:nth-child(even) {
+            transform: translateX(50px);
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px var(--shadow-soft);
+            width: 45%;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: auto;
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: var(--rose-red);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: var(--rose-red);
+            border-radius: 50%;
+            border: 4px solid var(--warm-cream);
+            box-shadow: 0 0 20px var(--shadow-medium);
+        }
+
+        /* ============================================
+           LOVE LETTER SECTION
+           ============================================ */
+        .love-letter-section {
+            padding: 5rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 179, 217, 0.3), rgba(200, 162, 200, 0.3));
+        }
+
+        .surprise-btn {
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, var(--rose-red), var(--deep-pink));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 25px var(--shadow-medium);
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .surprise-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 35px var(--shadow-medium);
+        }
+
+        .love-letter {
+            max-width: 700px;
+            margin: 3rem auto;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px var(--shadow-medium);
+            display: none;
+            text-align: left;
+            line-height: 2;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .love-letter.show {
+            display: block;
+            animation: fadeInScale 0.8s ease-out;
+        }
+
+        .love-letter p {
+            margin-bottom: 1.5rem;
+        }
+
+        /* ============================================
+           MUSIC PLAYER
+           ============================================ */
+        .music-player {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 50px;
+            box-shadow: 0 8px 25px var(--shadow-medium);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .music-toggle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--rose-red), var(--deep-pink));
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* ============================================
+           CLOSING SECTION
+           ============================================ */
+        .closing-section {
+            padding: 5rem 2rem;
+            text-align: center;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pulsing-heart {
+            font-size: 4rem;
+            color: var(--rose-red);
+            animation: pulse 2s ease-in-out infinite;
+            margin-bottom: 2rem;
+        }
+
+        .closing-message {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--rose-red);
+            max-width: 700px;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 768px) {
+            .password-container {
+                padding: 2rem;
+            }
+
+            .password-container h2 {
+                font-size: 2rem;
+            }
+
+            .photo-frame {
+                width: 250px;
+                height: 250px;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-content {
+                width: calc(100% - 60px);
+                margin-left: 60px !important;
+            }
+
+            .timeline-item {
+                transform: translateX(0) !important;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+
+            .music-player {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.8rem;
+            }
+
+            .reasons-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Password Screen -->
+    <div class="password-screen" id="passwordScreen">
+        <div class="lock-icon">🔒</div>
+        <div class="password-container">
+            <h2>Our Secret Place</h2>
+            <input 
+                type="password" 
+                class="password-input" 
+                id="passwordInput" 
+                placeholder="Enter the password..."
+                autocomplete="off"
+            >
+            <button class="password-btn" id="passwordBtn">Enter ❤️</button>
+            <p class="password-hint">You already know the password ❤️</p>
+            <div class="error-message" id="errorMessage">Incorrect password. Try again.</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hearts-container" id="heartsContainer"></div>
+            <h1 class="hero-title">Our Little Universe ✨</h1>
+            <p class="hero-subtitle">
+                We met on a screen and somehow you became my entire world. 
+                Three years of messages, calls, and laughter—yet you feel closer 
+                than anyone I have ever known.
+            </p>
+        </section>
+
+        <!-- Photo Section -->
+        <section class="photo-section">
+            <div class="photo-frame">
+                <img src="fatima.jpeg" alt="Beautiful You" id="herPhoto">
+            </div>
+            <p class="photo-caption">
+                "Even from miles away, this smile feels like home. 
+                Until the day we finally meet, this space holds all my love for you."
+            </p>
+        </section>
+
+        <!-- Why I Love You Section -->
+        <section class="love-reasons">
+            <h2 class="section-title">Why I Love You</h2>
+            <div class="reasons-grid" id="reasonsGrid">
+                <div class="reason-card">
+                    <div class="reason-number">01</div>
+                    <div class="reason-text">Your late-night calls calm me in ways nothing else can.</div>
+                </div>
+                <div class="reason-card">
+                    <div class="reason-number">02</div>
+                    <div class="reason-text">You turn ordinary messages into the best part of my day.</div>
+                </div>
+                <div class="reason-card">
+                    <div class="reason-number">03</div>
+                    <div class="reason-text">We built trust without borders—distance never dimmed us.</div>
+                </div>
+                <div class="reason-card">
+                    <div class="reason-number">04</div>
+                    <div class="reason-text">You remember every small detail I share, even over chat.</div>
+                </div>
+                <div class="reason-card">
+                    <div class="reason-number">05</div>
+                    <div class="reason-text">Your patience and kindness make the miles disappear.</div>
+                </div>
+                <div class="reason-card">
+                    <div class="reason-number">06</div>
+                    <div class="reason-text">Three years in, our bond proves hearts travel any distance.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Section -->
+        <section class="timeline-section">
+            <h2 class="section-title">Our Story</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">The First Hello (Social Media)</div>
+                        <div class="timeline-text">A simple message that turned into the start of something beautiful.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Endless Chats</div>
+                        <div class="timeline-text">Hours blurred into nights as we shared stories, jokes, and dreams.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">First Call</div>
+                        <div class="timeline-text">Hearing your voice made the distance feel small and my heart feel full.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Three Years Strong</div>
+                        <div class="timeline-text">Still growing closer every day, waiting for the moment we finally meet in person.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Love Letter Section -->
+        <section class="love-letter-section">
+            <button class="surprise-btn" id="surpriseBtn">Click for a Surprise ❤️</button>
+            <div class="love-letter" id="loveLetter">
+                <p>My Dearest Love,</p>
+                <p>
+                    We found each other on a screen, yet you have become the warmest part of my life. 
+                    For three years we've laughed, shared secrets, and held on to each other through every message and call.
+                </p>
+                <p>
+                    Distance never stopped us. Your voice has been my calm, your words my comfort, and your heart my home. 
+                    Every ping, every late-night chat, every \"good morning\" reminds me how extraordinary our bond is.
+                </p>
+                <p>
+                    I dream of the day we finally stand side by side. Until then, know that you are loved beyond measure, 
+                    cherished beyond words, and adored across every mile between us.
+                </p>
+                <p style="text-align: right; margin-top: 2rem; font-family: 'Dancing Script', cursive; font-size: 1.3rem;">
+                    Forever yours,<br>
+                    With all my love ❤️<br>
+                    — Mohd Fazal
+                </p>
+            </div>
+        </section>
+
+        <!-- Closing Section -->
+        <section class="closing-section">
+            <div class="pulsing-heart">❤️</div>
+            <p class="closing-message">Forever starts with us.</p>
+        </section>
+    </div>
+
+    <!-- Music Player -->
+    <div class="music-player" id="musicPlayer" style="display: none;">
+        <button class="music-toggle" id="musicToggle">🎵</button>
+        <audio id="backgroundMusic" loop>
+            <!-- Add your music file here -->
+            <!-- <source src="romantic-music.mp3" type="audio/mpeg"> -->
+        </audio>
+    </div>
+
+    <script>
+        // ============================================
+        // PASSWORD PROTECTION
+        // ============================================
+        const passwordScreen = document.getElementById('passwordScreen');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordBtn = document.getElementById('passwordBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const mainContent = document.getElementById('mainContent');
+
+        // Set your password here (default: "love")
+        const CORRECT_PASSWORD = "homeisyou";
+
+        // Function to check password
+        function checkPassword() {
+            const enteredPassword = passwordInput.value.trim().toLowerCase();
+            
+            if (enteredPassword === CORRECT_PASSWORD.toLowerCase()) {
+                // Correct password - hide password screen
+                passwordScreen.classList.add('hidden');
+                mainContent.style.opacity = '1';
+                
+                // Start animations
+                setTimeout(() => {
+                    createFloatingHearts();
+                    observeElements();
+                }, 500);
+            } else {
+                // Wrong password - show error
+                errorMessage.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.focus();
+                
+                setTimeout(() => {
+                    errorMessage.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Event listeners for password
+        passwordBtn.addEventListener('click', checkPassword);
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // ============================================
+        // FLOATING HEARTS ANIMATION
+        // ============================================
+        function createFloatingHearts() {
+            const heartsContainer = document.getElementById('heartsContainer');
+            const hearts = ['❤️', '💕', '💖', '💗', '💓', '💝', '✨'];
+            
+            function createHeart() {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heartsContainer.appendChild(heart);
+                
+                // Remove heart after animation
+                setTimeout(() => {
+                    heart.remove();
+                }, 20000);
+            }
+            
+            // Create hearts periodically
+            setInterval(createHeart, 2000);
+            
+            // Create initial hearts
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createHeart, i * 400);
+            }
+        }
+
+        // ============================================
+        // SCROLL ANIMATIONS
+        // ============================================
+        function observeElements() {
+            // Intersection Observer for fade-in animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe reason cards
+            const reasonCards = document.querySelectorAll('.reason-card');
+            reasonCards.forEach(card => {
+                observer.observe(card);
+            });
+
+            // Observe timeline items
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        // ============================================
+        // LOVE LETTER REVEAL
+        // ============================================
+        const surpriseBtn = document.getElementById('surpriseBtn');
+        const loveLetter = document.getElementById('loveLetter');
+        let letterRevealed = false;
+
+        surpriseBtn.addEventListener('click', () => {
+            if (!letterRevealed) {
+                loveLetter.classList.add('show');
+                surpriseBtn.textContent = 'Read Again ❤️';
+                letterRevealed = true;
+                
+                // Scroll to letter
+                loveLetter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                loveLetter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        // ============================================
+        // MUSIC PLAYER (OPTIONAL)
+        // ============================================
+        const musicToggle = document.getElementById('musicToggle');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const musicPlayer = document.getElementById('musicPlayer');
+        let musicPlaying = false;
+
+        // Uncomment and add your music file to enable music player
+        // musicPlayer.style.display = 'flex';
+
+        musicToggle.addEventListener('click', () => {
+            if (musicPlaying) {
+                backgroundMusic.pause();
+                musicToggle.textContent = '🎵';
+                musicPlaying = false;
+            } else {
+                backgroundMusic.play().catch(() => {
+                    alert('Please add a music file to enable background music!');
+                });
+                musicToggle.textContent = '⏸️';
+                musicPlaying = true;
+            }
+        });
+
+        // ============================================
+        // SMOOTH SCROLLING
+        // ============================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // ============================================
+        // PHOTO PLACEHOLDER HANDLING
+        // ============================================
+        const herPhoto = document.getElementById('herPhoto');
+        herPhoto.addEventListener('error', function() {
+            // If image fails to load, you can set a placeholder or hide it
+            this.style.display = 'none';
+            const photoFrame = this.closest('.photo-frame');
+            if (photoFrame) {
+                photoFrame.innerHTML = '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--blush-pink), var(--lavender)); color: white; font-size: 3rem;">❤️</div>';
+            }
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        // Focus password input on load
+        window.addEventListener('load', () => {
+            passwordInput.focus();
+        });
+    </script>
+</body>
+</html>
